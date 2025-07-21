@@ -1,5 +1,6 @@
 {
   "name": "kens-art-portfolio",
+  "homepage": "https://www.kheckeroth.com",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
