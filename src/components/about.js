@@ -8,7 +8,6 @@ const videoPath = 'https://storage.googleapis.com/kens-art-portfolio-assets/Nebu
 const AboutMe = ({ onContactOpen }) => {
   return (
     <>
-      {/* The video element now serves as a background */}
       <Box
         component="video"
         autoPlay
