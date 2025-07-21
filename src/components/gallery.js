@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, ImageList, ImageListItem, Modal, IconButton, Typography, CircularProgress, Alert, Fade, Paper, Grid, Chip } from '@mui/material';
+import { Box, ImageList, ImageListItem, Modal, IconButton, Typography, CircularProgress, Alert, Fade, Paper, Chip } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import CloseIcon from '@mui/icons-material/Close';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
@@ -105,7 +105,7 @@ function Gallery() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('https://storage.googleapis.com/kens-art-portfolio-assets/art.json');
+        const response = await fetch(`https://storage.googleapis.com/kens-art-portfolio-assets/art.json?t=${new Date().getTime()}`);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
