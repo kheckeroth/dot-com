@@ -157,7 +157,7 @@ function Gallery() {
   }
 
   return (
-    <Box sx={{ p: { xs: 1, sm: 2, md: 3 } }}>
+    <Box sx={{ mt: '-15vh', p: { xs: 1, sm: 2, md: 3 } }}>
       <ImageList variant="masonry" cols={3} gap={16}>
         {artPieces.map((item) => (
           <StyledImageListItem key={item.id} onClick={() => handleOpenModal(item)}>
@@ -200,7 +200,7 @@ function Gallery() {
                       <IconButton onClick={handlePrevImage} sx={{ position: 'absolute', top: '50%', left: 8, transform: 'translateY(-50%)', color: 'white', bgcolor: 'rgba(0,0,0,0.4)', '&:hover': { bgcolor: 'rgba(0,0,0,0.6)'} }}>
                         <ArrowBackIosNewIcon />
                       </IconButton>
-                       <IconButton onClick={handleNextImage} sx={{ position: 'absolute', top: '50%', right: 8, transform: 'translateY(-50%)', color: 'white', bgcolor: 'rgba(0,0,0,0.4)', '&:hover': { bgcolor: 'rgba(0,0,0,0.6)'} }}>
+                      <IconButton onClick={handleNextImage} sx={{ position: 'absolute', top: '50%', right: 8, transform: 'translateY(-50%)', color: 'white', bgcolor: 'rgba(0,0,0,0.4)', '&:hover': { bgcolor: 'rgba(0,0,0,0.6)'} }}>
                         <ArrowForwardIosIcon />
                       </IconButton>
                     </>
@@ -208,7 +208,7 @@ function Gallery() {
                 </ImageContainer>
 
                 <DetailsContainer>
-                   <IconButton onClick={handleCloseModal} sx={{ position: 'absolute', top: 8, right: 8, color: 'text.secondary' }}>
+                  <IconButton onClick={handleCloseModal} sx={{ position: 'absolute', top: 8, right: 8, color: 'text.secondary' }}>
                     <CloseIcon />
                   </IconButton>
                   
