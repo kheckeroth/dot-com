@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Box, ImageList, ImageListItem, Modal, IconButton, Typography, CircularProgress, Alert, Fade, Paper, Chip } from '@mui/material';
-import { styled } from '@mui/material/styles';
+import { styled, alpha } from '@mui/material/styles';
 import CloseIcon from '@mui/icons-material/Close';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
@@ -14,6 +14,18 @@ const StyledImageListItem = styled(ImageListItem)(({ theme }) => ({
   position: 'relative',
   cursor: 'pointer',
   overflow: 'hidden',
+  aspectRatio: '1 / 1',
+  backgroundColor: theme.palette.grey[200],
+  borderRadius: theme.shape.borderRadius, // Add rounded corners
+  boxShadow: theme.shadows[2], // Add a subtle, default shadow
+  transition: theme.transitions.create(['box-shadow', 'transform'], { // Add transitions for smooth effects
+    duration: theme.transitions.duration.short,
+  }),
+  // On hover, lift the card and increase the shadow
+  '&:hover': {
+    transform: 'scale(1.02)',
+    boxShadow: theme.shadows[8],
+  },
   '& .overlay': {
     position: 'absolute',
     inset: 0,
@@ -39,19 +51,40 @@ const StyledImageListItem = styled(ImageListItem)(({ theme }) => ({
       transform: 'translateY(0)',
     },
   },
+  '& img': {
+    width: '100%',
+    height: '100%',
+    objectFit: 'cover',
+    display: 'block',
+  }
 }));
 
 const SoldBadge = styled('div')(({ theme }) => ({
   position: 'absolute',
   top: theme.spacing(1.5),
   left: theme.spacing(1.5),
-  backgroundColor: 'rgba(192, 57, 43, 0.85)',
-  color: 'white',
+  backgroundColor: alpha(theme.palette.error.main, 0.85),
+  color: theme.palette.error.contrastText,
   padding: theme.spacing(0.5, 1.5),
   borderRadius: theme.shape.borderRadius,
   fontWeight: 'bold',
   fontSize: '0.8rem',
   backdropFilter: 'blur(4px)',
+  zIndex: 1,
+}));
+
+const NotForSaleBadge = styled('div')(({ theme }) => ({
+  position: 'absolute',
+  top: theme.spacing(1.5),
+  left: theme.spacing(1.5),
+  backgroundColor: alpha(theme.palette.secondary.main, 0.85),
+  color: theme.palette.secondary.contrastText,
+  padding: theme.spacing(0.5, 1.5),
+  borderRadius: theme.shape.borderRadius,
+  fontWeight: 'bold',
+  fontSize: '0.8rem',
+  backdropFilter: 'blur(4px)',
+  zIndex: 1,
 }));
 
 
@@ -63,10 +96,11 @@ const ModalContent = styled(Paper)(({ theme }) => ({
   width: '90vw',
   maxWidth: '1200px',
   maxHeight: '90vh',
-  overflowY: 'auto',
+  overflow: 'hidden',
   display: 'flex',
   flexDirection: 'row',
-  backgroundColor: theme.palette.background.paper,
+  backgroundColor: alpha(theme.palette.background.paper, 0.85),
+  backdropFilter: 'blur(8px)',
   boxShadow: 24,
   outline: 'none',
   [theme.breakpoints.down('md')]: {
@@ -83,12 +117,27 @@ const ImageContainer = styled('div')({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
+  overflow: 'hidden',
 });
+
+const MediaDescription = styled(Typography)(({ theme }) => ({
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    padding: theme.spacing(1.5, 2),
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    color: 'white',
+    fontSize: '0.9rem',
+}));
 
 const DetailsContainer = styled('div')(({ theme }) => ({
   flex: '1 1 35%',
   padding: theme.spacing(4),
   overflowY: 'auto',
+  '& .MuiTypography-root': {
+    textShadow: '0 0 2px rgba(255, 255, 255, 0.2)',
+  }
 }));
 
 // --- Main Gallery Component ---
@@ -120,7 +169,8 @@ function Gallery() {
     };
     fetchData();
   }, []);
-  
+
+  // D3 animation effect
   useEffect(() => {
     if (!loading && artPieces.length > 0) {
         const galleryItems = d3.selectAll('.gallery-item-container');
@@ -131,19 +181,18 @@ function Gallery() {
         galleryItems.on('mouseenter', function() {
             const item = d3.select(this);
             if (timers.has(this)) return;
+            
+            // The z-index needs to be on the container for the hover effect and stars to overlap correctly
+            item.style('z-index', 10);
 
-            // Get the original container dimensions
             const containerWidth = this.clientWidth;
             const containerHeight = this.clientHeight;
-            
+
             const svg = item.append('svg').attr('class', 'star-svg');
 
-            // --- MODIFICATION HERE ---
-            // The SVG's dimensions are now 120% of the container
             const svgWidth = containerWidth * 1.2;
             const svgHeight = containerHeight * 1.2;
-            
-            // Calculate the center of the NEW, larger SVG canvas
+
             const centerX = svgWidth / 2;
             const centerY = svgHeight / 2;
 
@@ -165,13 +214,12 @@ function Gallery() {
                 .duration(500)
                 .ease(d3.easeCubicOut)
                 .attr('transform', `translate(${centerX}, ${centerY}) scale(0.8)`);
-            
-            let angle = Math.random() * 2 * Math.PI; 
-            
+
+            let angle = Math.random() * 2 * Math.PI;
+
             const timer = d3.timer(elapsed => {
                 angle += 0.002;
 
-                // Orbit radius can be based on the original container width
                 const primaryOrbitRadius = containerWidth * 0.35;
                 const secondaryOrbitRadius = 40;
 
@@ -180,13 +228,13 @@ function Gallery() {
 
                 stars.attr('transform', (d, i) => {
                     const secondaryAngle = angle * 5;
-                    const starAngle = secondaryAngle + (i * Math.PI); 
+                    const starAngle = secondaryAngle + (i * Math.PI);
 
                     const x = barycenterX + secondaryOrbitRadius * Math.cos(starAngle);
                     const y = barycenterY + secondaryOrbitRadius * Math.sin(starAngle);
-                    
+
                     const twinkle = 0.8 + Math.sin(elapsed / 300 + i * Math.PI) * 0.1;
-                    
+
                     return `translate(${x}, ${y}) rotate(${elapsed / 10}) scale(${twinkle})`;
                 });
             });
@@ -197,12 +245,16 @@ function Gallery() {
         galleryItems.on('mouseleave', function() {
             const item = d3.select(this);
             const timer = timers.get(this);
+            
+            // Reset z-index after a delay to allow the card to settle back
+            setTimeout(() => {
+                item.style('z-index', 1);
+            }, 300);
 
             if (timer) {
                 timer.stop();
                 timers.delete(this);
-                
-                // We need the center of the SVG for the exit animation
+
                 const svgWidth = this.clientWidth * 1.2;
                 const svgHeight = this.clientHeight * 1.2;
                 const centerX = svgWidth / 2;
@@ -238,14 +290,20 @@ function Gallery() {
 
   const handlePrevImage = () => {
     setSelectedImageIndex((prevIndex) =>
-      prevIndex === 0 ? selectedArt.images.length - 1 : prevIndex - 1
+      prevIndex === 0 ? selectedArt.media.length - 1 : prevIndex - 1
     );
   };
 
   const handleNextImage = () => {
     setSelectedImageIndex((prevIndex) =>
-      prevIndex === selectedArt.images.length - 1 ? 0 : prevIndex + 1
+      prevIndex === selectedArt.media.length - 1 ? 0 : prevIndex + 1
     );
+  };
+
+  const getPriceDisplay = (item) => {
+    if (item.sold) return 'N/A';
+    if (item.price === 0 || item.price === null) return 'Contact for Info';
+    return `$${item.price.toFixed(2)}`;
   };
 
   // --- Render Logic ---
@@ -259,23 +317,35 @@ function Gallery() {
   }
 
   return (
-    <Box sx={{ mt: '-15vh', p: { xs: 1, sm: 2, md: 3 } }}>
-      <ImageList ref={galleryRef} variant="masonry" cols={3} gap={16}>
+    <Box sx={{ p: { xs: 1, sm: 2, md: 3 } }}>
+      <ImageList ref={galleryRef} variant="standard" cols={3} gap={24}> {/* Increased gap for shadow */}
         {artPieces.map((item) => (
-          <div key={item.id} className="gallery-item-container">
+          // Add position relative to the container for z-index to work
+          <div key={item.id} className="gallery-item-container" style={{ position: 'relative' }}>
             <StyledImageListItem onClick={() => handleOpenModal(item)}>
-              <img
-                src={`${item.images[0]}?w=400&fit=crop&auto=format`}
-                srcSet={`${item.images[0]}?w=400&fit=crop&auto=format&dpr=2 2x`}
-                alt={item.name}
-                loading="lazy"
-                style={{ width: '100%', display: 'block' }}
-              />
-              {item.sold && <SoldBadge>Sold</SoldBadge>}
+              {item.sold ? (
+                <SoldBadge>Sold</SoldBadge>
+              ) : (item.price === 0 || item.price === null) && (
+                <NotForSaleBadge>Not for Sale</NotForSaleBadge>
+              )}
+
+              {item.media && item.media[0] ? (
+                  <img
+                    src={`${item.media[0].url}?w=400&fit=crop&auto=format`}
+                    srcSet={`${item.media[0].url}?w=400&fit=crop&auto=format&dpr=2 2x`}
+                    alt={item.name}
+                    loading="lazy"
+                  />
+              ) : (
+                <Box sx={{width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                    <Typography variant="caption" color="text.secondary">No Image</Typography>
+                </Box>
+              )}
+              
               <div className="overlay">
                 <Typography variant="h6" className="title">{item.name}</Typography>
                 <Typography variant="body1" className="price">
-                  {item.sold ? 'N/A' : `$${item.price.toFixed(2)}`}
+                  {getPriceDisplay(item)}
                 </Typography>
               </div>
             </StyledImageListItem>
@@ -291,49 +361,70 @@ function Gallery() {
       >
         <Fade in={modalOpen}>
           <ModalContent>
-            {selectedArt && (
-              <>
-                <ImageContainer>
-                  <img
-                    src={selectedArt.images[selectedImageIndex]}
-                    alt={`${selectedArt.name} - view ${selectedImageIndex + 1}`}
-                    style={{ maxWidth: '100%', maxHeight: '90vh', objectFit: 'contain' }}
-                  />
-                  {selectedArt.images.length > 1 && (
-                    <>
-                      <IconButton onClick={handlePrevImage} sx={{ position: 'absolute', top: '50%', left: 8, transform: 'translateY(-50%)', color: 'white', bgcolor: 'rgba(0,0,0,0.4)', '&:hover': { bgcolor: 'rgba(0,0,0,0.6)'} }}>
-                        <ArrowBackIosNewIcon />
-                      </IconButton>
-                      <IconButton onClick={handleNextImage} sx={{ position: 'absolute', top: '50%', right: 8, transform: 'translateY(-50%)', color: 'white', bgcolor: 'rgba(0,0,0,0.4)', '&:hover': { bgcolor: 'rgba(0,0,0,0.6)'} }}>
-                        <ArrowForwardIosIcon />
-                      </IconButton>
-                    </>
-                  )}
-                </ImageContainer>
+            {selectedArt && (() => {
+              const currentMedia = selectedArt.media[selectedImageIndex];
+              const isVideo = currentMedia.url.endsWith('.mp4');
 
-                <DetailsContainer>
-                  <IconButton onClick={handleCloseModal} sx={{ position: 'absolute', top: 8, right: 8, color: 'text.secondary' }}>
-                    <CloseIcon />
-                  </IconButton>
-                  
-                  <Typography variant="h3" component="h2" gutterBottom sx={{ fontWeight: 300 }}>
-                    {selectedArt.name}
-                  </Typography>
+              return (
+                <>
+                  <ImageContainer>
+                    {isVideo ? (
+                      <video
+                        src={currentMedia.url}
+                        style={{ maxWidth: '100%', maxHeight: '90vh', objectFit: 'contain' }}
+                        controls
+                        autoPlay
+                        loop
+                        muted
+                      />
+                    ) : (
+                      <img
+                        src={currentMedia.url}
+                        alt={currentMedia.description}
+                        style={{ maxWidth: '100%', maxHeight: '90vh', objectFit: 'contain' }}
+                      />
+                    )}
+                    
+                    {currentMedia.description && (
+                        <MediaDescription>{currentMedia.description}</MediaDescription>
+                    )}
 
-                  {selectedArt.sold ? (
-                    <Chip label="Sold" color="error" variant="outlined" sx={{ mb: 2 }} />
-                  ) : (
-                    <Typography variant="h4" color="primary" sx={{ mb: 2, fontWeight: 'bold' }}>
-                      ${selectedArt.price.toFixed(2)}
+                    {selectedArt.media.length > 1 && (
+                      <>
+                        <IconButton onClick={handlePrevImage} sx={{ position: 'absolute', top: '50%', left: 8, transform: 'translateY(-50%)', color: 'white', bgcolor: 'rgba(0,0,0,0.4)', '&:hover': { bgcolor: 'rgba(0,0,0,0.6)'} }}>
+                          <ArrowBackIosNewIcon />
+                        </IconButton>
+                        <IconButton onClick={handleNextImage} sx={{ position: 'absolute', top: '50%', right: 8, transform: 'translateY(-50%)', color: 'white', bgcolor: 'rgba(0,0,0,0.4)', '&:hover': { bgcolor: 'rgba(0,0,0,0.6)'} }}>
+                          <ArrowForwardIosIcon />
+                        </IconButton>
+                      </>
+                    )}
+                  </ImageContainer>
+
+                  <DetailsContainer>
+                    <IconButton onClick={handleCloseModal} sx={{ position: 'absolute', top: 8, right: 8, color: 'text.secondary' }}>
+                      <CloseIcon />
+                    </IconButton>
+                    
+                    <Typography variant="h3" component="h2" gutterBottom sx={{ fontWeight: 300 }}>
+                      {selectedArt.name}
                     </Typography>
-                  )}
 
-                  <Typography variant="body1" color="text.secondary" paragraph>
-                    {selectedArt.description}
-                  </Typography>
-                </DetailsContainer>
-              </>
-            )}
+                    {selectedArt.sold ? (
+                      <Chip label="Sold" color="error" variant="outlined" sx={{ mb: 2 }} />
+                    ) : (
+                      <Typography variant="h4" color="primary" sx={{ mb: 2, fontWeight: 'bold' }}>
+                        {getPriceDisplay(selectedArt)}
+                      </Typography>
+                    )}
+
+                    <Typography variant="body1" color="text.secondary" paragraph>
+                      {selectedArt.description}
+                    </Typography>
+                  </DetailsContainer>
+                </>
+              );
+            })()}
           </ModalContent>
         </Fade>
       </Modal>
