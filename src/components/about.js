@@ -1,12 +1,35 @@
-import React from 'react';
-import { Box, Typography, Paper, Avatar } from '@mui/material';
+import React, { useState, useEffect } from 'react'; // MODIFIED: Added useState and useEffect
+import { Box, Typography, Paper, Avatar, CircularProgress, Alert } from '@mui/material'; // MODIFIED: Added CircularProgress and Alert
 
 const videoPath = 'https://storage.googleapis.com/kens-art-portfolio-assets/Nebula_Scene_Video_Generation_Request.mp4';
 
+
 const AboutMe = ({ onContactOpen }) => {
+  const [blurb, setBlurb] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchAboutData = async () => {
+      try {
+        const response = await fetch(`https://storage.googleapis.com/kens-art-portfolio-assets/art.json?t=${new Date().getTime()}`);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch: ${response.status}`);
+        }
+        const data = await response.json();
+        setBlurb(data.blurb); // Get the blurb from the JSON
+      } catch (e) {
+        setError(e.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAboutData();
+  }, []); 
+
   return (
     <>
-      {/* Background Video */}
       <Box
         component="video"
         autoPlay
@@ -30,15 +53,13 @@ const AboutMe = ({ onContactOpen }) => {
         Your browser does not support the video tag.
       </Box>
 
-      {/* Main Content Container */}
-      <Box sx={{ color: 'white', pb: '120px' /* Padding at the bottom to avoid overlap with footer */ }}>
-        {/* "About Me" Section */}
+      <Box sx={{ color: 'white', pb: '120px' }}>
         <Box
           sx={{
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
-            minHeight: '70vh', /* Changed from 90vh to move it up */
+            minHeight: '70vh',
             textAlign: 'center',
             p: 3,
           }}
@@ -66,15 +87,18 @@ const AboutMe = ({ onContactOpen }) => {
             />
             <Box textAlign={{ xs: 'center', md: 'left' }}>
               <Typography variant="h3" component="h1" gutterBottom sx={{ fontWeight: 'bold', color: 'white', letterSpacing: '1px' }}>
-                Kenneth Heckeroth
+                Kenneth Heckeroth Art
               </Typography>
+              
               <Typography variant="h6" sx={{ fontSize: { xs: '1rem', md: '1.25rem' }, lineHeight: 1.5, color: 'rgba(255, 255, 255, 0.9)' }}>
-                My work begins where the telescope ends. Since 2016, I have used resin and pigment not to paint pictures of the cosmos, but to create physical artifacts of the awe it inspires. Each piece is an exploration of deep time, cosmic light, and the profound questions that arise when we contemplate our place in the universe. By manipulating layers of translucent color and suspended metallic dust, I seek to capture the tension between the chaotic beauty of a nebula's birth and the silent, ordered vastness of space. Each piece is a discovery; a new star cluster revealed in a swirl of mica, a distant galaxy emerging from a cloud of color. My process is a form of meditation on reality itself, offering the viewer a tangible object to hold while pondering the intangible.              
+                {loading && <CircularProgress size={24} color="inherit" />}
+                {error && <Alert severity="error" sx={{ bgcolor: 'transparent', color: 'red' }}>Could not load bio.</Alert>}
+                {blurb}
               </Typography>
+
             </Box>
           </Paper>
         </Box>
-
       </Box>
     </>
   );

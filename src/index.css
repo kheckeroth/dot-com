@@ -1,3 +1,5 @@
+/* src/index.css */
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -10,4 +12,34 @@ body {
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+.gallery-item-container {
+    position: relative;
+    transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    overflow: hidden; /* This is necessary, so we'll work around it */
+    cursor: pointer;
+}
+
+.gallery-item-container:hover {
+    transform: scale(1.05);
+}
+
+/* MODIFICATION: Make SVG larger and re-center it */
+.star-svg {
+    position: absolute;
+    /* Position the oversized canvas so it's centered on the item */
+    top: -10%; 
+    left: -10%;
+    /* Set the canvas to be larger than the container */
+    width: 120%;
+    height: 120%;
+    pointer-events: none;
+}
+
+.orbiting-star {
+    fill: url(#star-gradient);
+    stroke: #ffffff;
+    stroke-width: 0.8px;
+    filter: drop-shadow(0 0 6px #adc0ff) blur(0.3px) brightness(1.2);
 }
