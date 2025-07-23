@@ -1,6 +1,6 @@
 // src/App.js
 import React, { useState } from 'react';
-import { createTheme, ThemeProvider, CssBaseline } from '@mui/material';
+import {Box, createTheme, ThemeProvider, CssBaseline  } from '@mui/material';
 
 import About from './components/about';
 import Contact from './components/contact';
@@ -39,10 +39,12 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <About onContactOpen={handleContactOpen} />
-      <Gallery />
-      <Contact open={contactOpen} handleClose={handleContactClose} />
-      <Footer onContactOpen={handleContactOpen} />
+      <Box component="main" sx={{ pb: '120px' }}>
+        <About onContactOpen={handleContactOpen} />
+        <Gallery />
+        <Contact open={contactOpen} handleClose={handleContactClose} />
+        <Footer onContactOpen={handleContactOpen} />
+      </Box>
     </ThemeProvider>
   );
 }
