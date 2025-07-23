@@ -1,7 +1,8 @@
-// src/components/gallery.js
-
 import React, { useState, useEffect, useRef } from 'react';
-import { Box, ImageList, ImageListItem, Modal, IconButton, Typography, CircularProgress, Alert, Fade, Paper, Chip } from '@mui/material';
+import {
+    Box, ImageList, ImageListItem, Modal, IconButton, Typography, CircularProgress,
+    Alert, Fade, Paper, Chip, Button, TextField, FormControlLabel, Checkbox
+} from '@mui/material';
 import { styled, alpha } from '@mui/material/styles';
 import CloseIcon from '@mui/icons-material/Close';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
@@ -11,113 +12,111 @@ import * as d3 from 'd3';
 // --- Styled Components ---
 
 const StyledImageListItem = styled(ImageListItem)(({ theme }) => ({
-  position: 'relative',
-  cursor: 'pointer',
-  overflow: 'hidden',
-  aspectRatio: '1 / 1',
-  backgroundColor: theme.palette.grey[200],
-  borderRadius: theme.shape.borderRadius, // Add rounded corners
-  boxShadow: theme.shadows[2], // Add a subtle, default shadow
-  transition: theme.transitions.create(['box-shadow', 'transform'], { // Add transitions for smooth effects
-    duration: theme.transitions.duration.short,
-  }),
-  // On hover, lift the card and increase the shadow
-  '&:hover': {
-    transform: 'scale(1.02)',
-    boxShadow: theme.shadows[8],
-  },
-  '& .overlay': {
-    position: 'absolute',
-    inset: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0)',
-    transition: theme.transitions.create('background-color', {
-      duration: theme.transitions.duration.short,
+    position: 'relative',
+    cursor: 'pointer',
+    overflow: 'hidden',
+    aspectRatio: '1 / 1',
+    backgroundColor: theme.palette.grey[200],
+    borderRadius: theme.shape.borderRadius,
+    boxShadow: theme.shadows[2],
+    transition: theme.transitions.create(['box-shadow', 'transform'], {
+        duration: theme.transitions.duration.short,
     }),
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'flex-end',
-    padding: theme.spacing(2),
-    color: 'white',
-    opacity: 0,
-    '& .title, & .price': {
-      transform: 'translateY(20px)',
-      transition: 'transform 0.3s ease-out',
+    '&:hover': {
+        transform: 'scale(1.02)',
+        boxShadow: theme.shadows[8],
     },
-  },
-  '&:hover .overlay': {
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
-    opacity: 1,
-    '& .title, & .price': {
-      transform: 'translateY(0)',
+    '& .overlay': {
+        position: 'absolute',
+        inset: 0,
+        backgroundColor: 'rgba(0, 0, 0, 0)',
+        transition: theme.transitions.create('background-color', {
+            duration: theme.transitions.duration.short,
+        }),
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'flex-end',
+        padding: theme.spacing(2),
+        color: 'white',
+        opacity: 0,
+        '& .title, & .price': {
+            transform: 'translateY(20px)',
+            transition: 'transform 0.3s ease-out',
+        },
     },
-  },
-  '& img': {
-    width: '100%',
-    height: '100%',
-    objectFit: 'cover',
-    display: 'block',
-  }
+    '&:hover .overlay': {
+        backgroundColor: 'rgba(0, 0, 0, 0.6)',
+        opacity: 1,
+        '& .title, & .price': {
+            transform: 'translateY(0)',
+        },
+    },
+    '& img': {
+        width: '100%',
+        height: '100%',
+        objectFit: 'cover',
+        display: 'block',
+    }
 }));
 
 const SoldBadge = styled('div')(({ theme }) => ({
-  position: 'absolute',
-  top: theme.spacing(1.5),
-  left: theme.spacing(1.5),
-  backgroundColor: alpha(theme.palette.error.main, 0.85),
-  color: theme.palette.error.contrastText,
-  padding: theme.spacing(0.5, 1.5),
-  borderRadius: theme.shape.borderRadius,
-  fontWeight: 'bold',
-  fontSize: '0.8rem',
-  backdropFilter: 'blur(4px)',
-  zIndex: 1,
+    position: 'absolute',
+    top: theme.spacing(1.5),
+    left: theme.spacing(1.5),
+    backgroundColor: alpha(theme.palette.error.main, 0.85),
+    color: theme.palette.error.contrastText,
+    padding: theme.spacing(0.5, 1.5),
+    borderRadius: theme.shape.borderRadius,
+    fontWeight: 'bold',
+    fontSize: '0.8rem',
+    backdropFilter: 'blur(4px)',
+    zIndex: 1,
 }));
 
 const NotForSaleBadge = styled('div')(({ theme }) => ({
-  position: 'absolute',
-  top: theme.spacing(1.5),
-  left: theme.spacing(1.5),
-  backgroundColor: alpha(theme.palette.secondary.main, 0.85),
-  color: theme.palette.secondary.contrastText,
-  padding: theme.spacing(0.5, 1.5),
-  borderRadius: theme.shape.borderRadius,
-  fontWeight: 'bold',
-  fontSize: '0.8rem',
-  backdropFilter: 'blur(4px)',
-  zIndex: 1,
+    position: 'absolute',
+    top: theme.spacing(1.5),
+    left: theme.spacing(1.5),
+    backgroundColor: alpha(theme.palette.secondary.main, 0.85),
+    color: theme.palette.secondary.contrastText,
+    padding: theme.spacing(0.5, 1.5),
+    borderRadius: theme.shape.borderRadius,
+    fontWeight: 'bold',
+    fontSize: '0.8rem',
+    backdropFilter: 'blur(4px)',
+    zIndex: 1,
 }));
 
-
 const ModalContent = styled(Paper)(({ theme }) => ({
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  width: '90vw',
-  maxWidth: '1200px',
-  maxHeight: '90vh',
-  overflow: 'hidden',
-  display: 'flex',
-  flexDirection: 'row',
-  backgroundColor: alpha(theme.palette.background.paper, 0.85),
-  backdropFilter: 'blur(8px)',
-  boxShadow: 24,
-  outline: 'none',
-  [theme.breakpoints.down('md')]: {
-    flexDirection: 'column',
-    width: '95vw',
-    maxHeight: '85vh',
-  },
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: '90vw',
+    maxWidth: '1200px',
+    maxHeight: '90vh',
+    overflow: 'hidden',
+    display: 'flex',
+    flexDirection: 'row',
+    backgroundColor: alpha(theme.palette.background.paper, 0.85),
+    backdropFilter: 'blur(8px)',
+    boxShadow: 24,
+    outline: 'none',
+    [theme.breakpoints.down('md')]: {
+        flexDirection: 'column',
+        width: '95vw',
+        maxHeight: '85vh',
+    },
 }));
 
 const ImageContainer = styled('div')({
-  position: 'relative',
-  flex: '1 1 65%',
-  backgroundColor: '#111',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  overflow: 'hidden',
+    position: 'relative',
+    flex: '1 1 65%',
+    backgroundColor: '#111',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
 });
 
 const MediaDescription = styled(Typography)(({ theme }) => ({
@@ -132,304 +131,452 @@ const MediaDescription = styled(Typography)(({ theme }) => ({
 }));
 
 const DetailsContainer = styled('div')(({ theme }) => ({
-  flex: '1 1 35%',
-  padding: theme.spacing(4),
-  overflowY: 'auto',
-  '& .MuiTypography-root': {
-    textShadow: '0 0 2px rgba(255, 255, 255, 0.2)',
-  }
+    flex: '1 1 35%',
+    padding: theme.spacing(4),
+    overflowY: 'auto',
+    '& .MuiTypography-root': {
+        textShadow: '0 0 2px rgba(255, 255, 255, 0.2)',
+    }
 }));
+
+// --- Inquiry Form Component ---
+
+
+const inquiryFormStyle = {
+   position: 'absolute',
+   top: '50%',
+   left: '50%',
+   transform: 'translate(-50%, -50%)',
+   width: { xs: '90vw', sm: 450 },
+   bgcolor: 'background.paper',
+   border: '1px solid #ddd',
+   borderRadius: 2,
+   boxShadow: 24,
+   p: 4,
+   color: 'black', // Default text color for the modal
+};
+
+function InquiryForm({ open, handleClose, artPiece }) {
+   const [email, setEmail] = useState('');
+   const [message, setMessage] = useState('');
+   const [honeypot, setHoneypot] = useState('');
+   const [isNotRobot, setIsNotRobot] = useState(false);
+   const [submitted, setSubmitted] = useState(false);
+
+   const handleSubmit = (e) => {
+       e.preventDefault();
+       if (honeypot) { // Bot check
+           return;
+       }
+       if (!isNotRobot) {
+           alert('Please confirm you are not a robot.');
+           return;
+       }
+       // Handle form submission logic (e.g., send to an API endpoint)
+       console.log({
+           artPieceId: artPiece.id,
+           artPieceName: artPiece.name,
+           inquiry: {
+               email,
+               message,
+           }
+       });
+       setSubmitted(true);
+   };
+
+   const handleModalClose = () => {
+       // Reset form state before closing
+       setSubmitted(false);
+       setEmail('');
+       setMessage('');
+       setIsNotRobot(false);
+       handleClose();
+   }
+
+   if (!artPiece) return null;
+
+   return (
+       <Modal
+           open={open}
+           onClose={handleModalClose}
+           aria-labelledby="inquiry-modal-title"
+       >
+           <Box sx={inquiryFormStyle}>
+               <IconButton
+                   aria-label="close"
+                   onClick={handleModalClose}
+                   sx={{ position: 'absolute', right: 8, top: 8, color: (theme) => theme.palette.grey.A400 }}
+               >
+                   <CloseIcon />
+               </IconButton>
+               <Typography id="inquiry-modal-title" variant="h6" component="h2" sx={{ color: 'black' }}>
+                   Inquiry for "{artPiece.name}"
+               </Typography>
+               {submitted ? (
+                   <Typography sx={{ mt: 2, color: 'black' }}>
+                       Thank you for your message! We'll get back to you shortly.
+                   </Typography>
+               ) : (
+                   <form onSubmit={handleSubmit} noValidate>
+                       <TextField
+                           fullWidth
+                           label="Your Email"
+                           type="email"
+                           value={email}
+                           onChange={(e) => setEmail(e.target.value)}
+                           margin="normal"
+                           required
+                           InputLabelProps={{
+                               style: { color: 'black' },
+                           }}
+                           inputProps={{
+                               style: { color: 'black' },
+                           }}
+                       />
+                       <TextField
+                           fullWidth
+                           label="Message"
+                           value={message}
+                           onChange={(e) => setMessage(e.target.value)}
+                           margin="normal"
+                           multiline
+                           rows={4}
+                           required
+                           InputLabelProps={{
+                               style: { color: 'black' },
+                           }}
+                           inputProps={{
+                               style: { color: 'black' },
+                           }}
+                       />
+                       {/* Honeypot field for bot prevention */}
+                       <TextField
+                           label="Subject"
+                           value={honeypot}
+                           onChange={(e) => setHoneypot(e.target.value)}
+                           style={{ display: 'none' }}
+                       />
+                       <FormControlLabel
+                           control={<Checkbox checked={isNotRobot} onChange={(e) => setIsNotRobot(e.target.checked)} sx={{ color: 'black' }} />}
+                           label="I am not a robot"
+                           sx={{ color: 'black' }}
+                       />
+                       <Button type="submit" variant="contained" sx={{ mt: 2, display: 'block', color: 'white' }}>
+                           Send Inquiry
+                       </Button>
+                   </form>
+               )}
+           </Box>
+       </Modal>
+   );
+}
+
 
 // --- Main Gallery Component ---
 
 function Gallery() {
-  const [artPieces, setArtPieces] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [selectedArt, setSelectedArt] = useState(null);
-  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
-  const galleryRef = useRef(null);
+    const [artPieces, setArtPieces] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [modalOpen, setModalOpen] = useState(false);
+    const [inquiryModalOpen, setInquiryModalOpen] = useState(false);
+    const [selectedArt, setSelectedArt] = useState(null);
+    const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+    const galleryRef = useRef(null);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch(`https://storage.googleapis.com/kens-art-portfolio-assets/art.json?t=${new Date().getTime()}`);
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
-        setArtPieces(data.art);
-      } catch (e) {
-        setError(e.message);
-        console.error("Failed to fetch artwork data:", e);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await fetch(`https://storage.googleapis.com/kens-art-portfolio-assets/art.json?t=${new Date().getTime()}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                setArtPieces(data.art);
+            } catch (e) {
+                setError(e.message);
+                console.error("Failed to fetch artwork data:", e);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchData();
+    }, []);
 
-  // D3 animation effect
-  useEffect(() => {
-    if (!loading && artPieces.length > 0) {
-        const galleryItems = d3.selectAll('.gallery-item-container');
+    // D3 animation effect (omitted for brevity, no changes needed)
+    useEffect(() => {
+        if (!loading && artPieces.length > 0) {
+            const galleryItems = d3.selectAll('.gallery-item-container');
 
-        const starPath = "M0,-10 L2.3, -5 L8.3, -5 L5, 0 L8.3, 5 L2.3, 5 L0, 10 L-2.3, 5 L-8.3, 5 L-5, 0 L-8.3, -5 L-2.3, -5 Z";
-        const timers = new Map();
+            const starPath = "M0,-10 L2.3, -5 L8.3, -5 L5, 0 L8.3, 5 L2.3, 5 L0, 10 L-2.3, 5 L-8.3, 5 L-5, 0 L-8.3, -5 L-2.3, -5 Z";
+            const timers = new Map();
 
-        galleryItems.on('mouseenter', function() {
-            const item = d3.select(this);
-            if (timers.has(this)) return;
-            
-            // The z-index needs to be on the container for the hover effect and stars to overlap correctly
-            item.style('z-index', 10);
+            galleryItems.on('mouseenter', function() {
+                const item = d3.select(this);
+                if (timers.has(this)) return;
 
-            const containerWidth = this.clientWidth;
-            const containerHeight = this.clientHeight;
+                item.style('z-index', 10);
 
-            const svg = item.append('svg').attr('class', 'star-svg');
+                const containerWidth = this.clientWidth;
+                const containerHeight = this.clientHeight;
 
-            const svgWidth = containerWidth * 1.2;
-            const svgHeight = containerHeight * 1.2;
+                const svg = item.append('svg').attr('class', 'star-svg');
 
-            const centerX = svgWidth / 2;
-            const centerY = svgHeight / 2;
+                const svgWidth = containerWidth * 1.2;
+                const svgHeight = containerHeight * 1.2;
 
-            const defs = svg.append('defs');
-            const starGradient = defs.append('radialGradient')
-                .attr('id', 'star-gradient');
-            starGradient.append('stop').attr('offset', '0%').attr('stop-color', '#ffffff');
-            starGradient.append('stop').attr('offset', '100%').attr('stop-color', '#d4e0ff');
-
-            const stars = svg.selectAll('.orbiting-star')
-                .data([{id: 1}, {id: 2}])
-                .enter()
-                .append('path')
-                .attr('class', 'orbiting-star')
-                .attr('d', starPath)
-                .attr('transform', `translate(${centerX}, ${centerY}) scale(0)`);
-
-            stars.transition()
-                .duration(500)
-                .ease(d3.easeCubicOut)
-                .attr('transform', `translate(${centerX}, ${centerY}) scale(0.8)`);
-
-            let angle = Math.random() * 2 * Math.PI;
-
-            const timer = d3.timer(elapsed => {
-                angle += 0.002;
-
-                const primaryOrbitRadius = containerWidth * 0.35;
-                const secondaryOrbitRadius = 40;
-
-                const barycenterX = centerX + primaryOrbitRadius * Math.cos(angle * 1.2);
-                const barycenterY = centerY + primaryOrbitRadius * Math.sin(angle * 1.2);
-
-                stars.attr('transform', (d, i) => {
-                    const secondaryAngle = angle * 5;
-                    const starAngle = secondaryAngle + (i * Math.PI);
-
-                    const x = barycenterX + secondaryOrbitRadius * Math.cos(starAngle);
-                    const y = barycenterY + secondaryOrbitRadius * Math.sin(starAngle);
-
-                    const twinkle = 0.8 + Math.sin(elapsed / 300 + i * Math.PI) * 0.1;
-
-                    return `translate(${x}, ${y}) rotate(${elapsed / 10}) scale(${twinkle})`;
-                });
-            });
-
-            timers.set(this, timer);
-        });
-
-        galleryItems.on('mouseleave', function() {
-            const item = d3.select(this);
-            const timer = timers.get(this);
-            
-            // Reset z-index after a delay to allow the card to settle back
-            setTimeout(() => {
-                item.style('z-index', 1);
-            }, 300);
-
-            if (timer) {
-                timer.stop();
-                timers.delete(this);
-
-                const svgWidth = this.clientWidth * 1.2;
-                const svgHeight = this.clientHeight * 1.2;
                 const centerX = svgWidth / 2;
                 const centerY = svgHeight / 2;
 
-                item.selectAll('.orbiting-star')
-                    .transition()
-                    .duration(400)
-                    .ease(d3.easeCubicIn)
-                    .attr('transform', `translate(${centerX}, ${centerY}) scale(0)`)
-                    .on('end', function() {
-                        if (item.select('.star-svg').node()) {
-                           item.select('.star-svg').remove();
-                        }
+                const stars = svg.selectAll('.orbiting-star')
+                    .data([{ id: 1 }, { id: 2 }])
+                    .enter()
+                    .append('path')
+                    .attr('class', 'orbiting-star')
+                    .attr('d', starPath)
+                    .attr('transform', `translate(${centerX}, ${centerY}) scale(0)`);
+
+                stars.transition()
+                    .duration(500)
+                    .ease(d3.easeCubicOut)
+                    .attr('transform', `translate(${centerX}, ${centerY}) scale(0.8)`);
+
+                let angle = Math.random() * 2 * Math.PI;
+
+                const timer = d3.timer(elapsed => {
+                    angle += 0.002;
+
+                    const primaryOrbitRadius = containerWidth * 0.35;
+                    const secondaryOrbitRadius = 40;
+
+                    const barycenterX = centerX + primaryOrbitRadius * Math.cos(angle * 1.2);
+                    const barycenterY = centerY + primaryOrbitRadius * Math.sin(angle * 1.2);
+
+                    stars.attr('transform', (d, i) => {
+                        const secondaryAngle = angle * 5;
+                        const starAngle = secondaryAngle + (i * Math.PI);
+
+                        const x = barycenterX + secondaryOrbitRadius * Math.cos(starAngle);
+                        const y = barycenterY + secondaryOrbitRadius * Math.sin(starAngle);
+
+                        const twinkle = 0.8 + Math.sin(elapsed / 300 + i * Math.PI) * 0.1;
+
+                        return `translate(${x}, ${y}) rotate(${elapsed / 10}) scale(${twinkle})`;
                     });
-            }
-        });
+                });
+
+                timers.set(this, timer);
+            });
+
+            galleryItems.on('mouseleave', function() {
+                const item = d3.select(this);
+                const timer = timers.get(this);
+
+                setTimeout(() => {
+                    item.style('z-index', 1);
+                }, 300);
+
+                if (timer) {
+                    timer.stop();
+                    timers.delete(this);
+
+                    const svgWidth = this.clientWidth * 1.2;
+                    const svgHeight = this.clientHeight * 1.2;
+                    const centerX = svgWidth / 2;
+                    const centerY = svgHeight / 2;
+
+                    item.selectAll('.orbiting-star')
+                        .transition()
+                        .duration(400)
+                        .ease(d3.easeCubicIn)
+                        .attr('transform', `translate(${centerX}, ${centerY}) scale(0)`)
+                        .on('end', function() {
+                            if (item.select('.star-svg').node()) {
+                                item.select('.star-svg').remove();
+                            }
+                        });
+                }
+            });
+        }
+    }, [loading, artPieces]);
+
+    // --- Modal and Image Navigation Handlers ---
+
+    const handleOpenModal = (artPiece) => {
+        setSelectedArt(artPiece);
+        setSelectedImageIndex(0);
+        setModalOpen(true);
+    };
+
+    const handleCloseModal = () => {
+        setModalOpen(false);
+        // Delay clearing to prevent content flash during fade-out
+        setTimeout(() => setSelectedArt(null), 300);
+    };
+
+    const handleOpenInquiryModal = () => {
+        setInquiryModalOpen(true);
+    };
+
+    const handleCloseInquiryModal = () => {
+        setInquiryModalOpen(false);
+    };
+
+    const handlePrevImage = () => {
+        setSelectedImageIndex((prevIndex) =>
+            prevIndex === 0 ? selectedArt.media.length - 1 : prevIndex - 1
+        );
+    };
+
+    const handleNextImage = () => {
+        setSelectedImageIndex((prevIndex) =>
+            prevIndex === selectedArt.media.length - 1 ? 0 : prevIndex + 1
+        );
+    };
+
+    // --- UPDATED: Price is now always shown if available ---
+    const getPriceDisplay = (item) => {
+        if (item.price === 0 || item.price === null) return 'Contact for Info';
+        return `$${item.price.toFixed(2)}`;
+    };
+
+    // --- Render Logic ---
+
+    if (loading) {
+        return <Box sx={{ display: 'flex', justifyContent: 'center', p: 5 }}><CircularProgress /></Box>;
     }
-  }, [loading, artPieces]);
 
-  // --- Modal and Image Navigation Handlers ---
+    if (error) {
+        return <Alert severity="error" sx={{ m: 3 }}>Failed to load gallery: {error}</Alert>;
+    }
 
-  const handleOpenModal = (artPiece) => {
-    setSelectedArt(artPiece);
-    setSelectedImageIndex(0);
-    setModalOpen(true);
-  };
+    return (
+        <Box sx={{ p: { xs: 1, sm: 2, md: 3 } }}>
+            <ImageList ref={galleryRef} variant="standard" cols={3} gap={24}>
+                {artPieces.map((item) => (
+                    <div key={item.id} className="gallery-item-container" style={{ position: 'relative' }}>
+                        <StyledImageListItem onClick={() => handleOpenModal(item)}>
+                            {item.sold ? (
+                                <SoldBadge>Sold</SoldBadge>
+                            ) : (item.price === 0 || item.price === null) && (
+                                <NotForSaleBadge>Not for Sale</NotForSaleBadge>
+                            )}
 
-  const handleCloseModal = () => {
-    setModalOpen(false);
-    setSelectedArt(null);
-  };
+                            {item.media && item.media[0] ? (
+                                <img
+                                    src={`${item.media[0].url}?w=400&fit=crop&auto=format`}
+                                    srcSet={`${item.media[0].url}?w=400&fit=crop&auto=format&dpr=2 2x`}
+                                    alt={item.name}
+                                    loading="lazy"
+                                />
+                            ) : (
+                                <Box sx={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                    <Typography variant="caption" color="text.secondary">No Image</Typography>
+                                </Box>
+                            )}
+                            <div className="overlay">
+                                <Typography variant="h6" className="title">{item.name}</Typography>
+                                <Typography variant="body1" className="price">
+                                    {getPriceDisplay(item)}
+                                </Typography>
+                            </div>
+                        </StyledImageListItem>
+                    </div>
+                ))}
+            </ImageList>
 
-  const handlePrevImage = () => {
-    setSelectedImageIndex((prevIndex) =>
-      prevIndex === 0 ? selectedArt.media.length - 1 : prevIndex - 1
+            {/* The Modal for Detailed View */}
+            <Modal
+                open={modalOpen}
+                onClose={handleCloseModal}
+                closeAfterTransition
+            >
+                <Fade in={modalOpen}>
+                    <ModalContent>
+                        {selectedArt && (() => {
+                            const currentMedia = selectedArt.media[selectedImageIndex];
+                            const isVideo = currentMedia.url.endsWith('.mp4');
+
+                            return (
+                                <>
+                                    <ImageContainer>
+                                        {isVideo ? (
+                                            <video
+                                                src={currentMedia.url}
+                                                style={{ maxWidth: '100%', maxHeight: '90vh', objectFit: 'contain' }}
+                                                controls autoPlay loop muted
+                                            />
+                                        ) : (
+                                            <img
+                                                src={currentMedia.url}
+                                                alt={currentMedia.description}
+                                                style={{ maxWidth: '100%', maxHeight: '90vh', objectFit: 'contain' }}
+                                            />
+                                        )}
+
+                                        {currentMedia.description && (
+                                            <MediaDescription>{currentMedia.description}</MediaDescription>
+                                        )}
+
+                                        {selectedArt.media.length > 1 && (
+                                            <>
+                                                <IconButton onClick={handlePrevImage} sx={{ position: 'absolute', top: '50%', left: 8, transform: 'translateY(-50%)', color: 'white', bgcolor: 'rgba(0,0,0,0.4)', '&:hover': { bgcolor: 'rgba(0,0,0,0.6)' } }}>
+                                                    <ArrowBackIosNewIcon />
+                                                </IconButton>
+                                                <IconButton onClick={handleNextImage} sx={{ position: 'absolute', top: '50%', right: 8, transform: 'translateY(-50%)', color: 'white', bgcolor: 'rgba(0,0,0,0.4)', '&:hover': { bgcolor: 'rgba(0,0,0,0.6)' } }}>
+                                                    <ArrowForwardIosIcon />
+                                                </IconButton>
+                                            </>
+                                        )}
+                                    </ImageContainer>
+
+                                    <DetailsContainer>
+                                        <IconButton onClick={handleCloseModal} sx={{ position: 'absolute', top: 8, right: 8, color: 'text.secondary' }}>
+                                            <CloseIcon />
+                                        </IconButton>
+
+                                        <Typography variant="h3" component="h2" gutterBottom sx={{ fontWeight: 300 }}>
+                                            {selectedArt.name}
+                                        </Typography>
+
+                                        {/* Combined Price and Status */}
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+                                            <Typography variant="h4" color="primary" sx={{ fontWeight: 'bold' }}>
+                                                {getPriceDisplay(selectedArt)}
+                                            </Typography>
+                                            {selectedArt.sold && (
+                                                <Chip label="Sold" color="error" variant="outlined" />
+                                            )}
+                                        </Box>
+
+                                        <Typography variant="body1" color="text.secondary" paragraph>
+                                            {selectedArt.description}
+                                        </Typography>
+
+                                        {/* NEW: Inquiry Button */}
+                                        <Button
+                                            variant="contained"
+                                            onClick={handleOpenInquiryModal}
+                                            sx={{ mt: 2 }}
+                                        >
+                                            Inquire about this piece
+                                        </Button>
+                                    </DetailsContainer>
+                                </>
+                            );
+                        })()}
+                    </ModalContent>
+                </Fade>
+            </Modal>
+
+            {/* The Modal for the Inquiry Form */}
+            <InquiryForm
+                open={inquiryModalOpen}
+                handleClose={handleCloseInquiryModal}
+                artPiece={selectedArt}
+            />
+        </Box>
     );
-  };
-
-  const handleNextImage = () => {
-    setSelectedImageIndex((prevIndex) =>
-      prevIndex === selectedArt.media.length - 1 ? 0 : prevIndex + 1
-    );
-  };
-
-  const getPriceDisplay = (item) => {
-    if (item.sold) return 'N/A';
-    if (item.price === 0 || item.price === null) return 'Contact for Info';
-    return `$${item.price.toFixed(2)}`;
-  };
-
-  // --- Render Logic ---
-
-  if (loading) {
-    return <Box sx={{ display: 'flex', justifyContent: 'center', p: 5 }}><CircularProgress /></Box>;
-  }
-
-  if (error) {
-    return <Alert severity="error" sx={{ m: 3 }}>Failed to load gallery: {error}</Alert>;
-  }
-
-  return (
-    <Box sx={{ p: { xs: 1, sm: 2, md: 3 } }}>
-      <ImageList ref={galleryRef} variant="standard" cols={3} gap={24}> {/* Increased gap for shadow */}
-        {artPieces.map((item) => (
-          // Add position relative to the container for z-index to work
-          <div key={item.id} className="gallery-item-container" style={{ position: 'relative' }}>
-            <StyledImageListItem onClick={() => handleOpenModal(item)}>
-              {item.sold ? (
-                <SoldBadge>Sold</SoldBadge>
-              ) : (item.price === 0 || item.price === null) && (
-                <NotForSaleBadge>Not for Sale</NotForSaleBadge>
-              )}
-
-              {item.media && item.media[0] ? (
-                  <img
-                    src={`${item.media[0].url}?w=400&fit=crop&auto=format`}
-                    srcSet={`${item.media[0].url}?w=400&fit=crop&auto=format&dpr=2 2x`}
-                    alt={item.name}
-                    loading="lazy"
-                  />
-              ) : (
-                <Box sx={{width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-                    <Typography variant="caption" color="text.secondary">No Image</Typography>
-                </Box>
-              )}
-              
-              <div className="overlay">
-                <Typography variant="h6" className="title">{item.name}</Typography>
-                <Typography variant="body1" className="price">
-                  {getPriceDisplay(item)}
-                </Typography>
-              </div>
-            </StyledImageListItem>
-          </div>
-        ))}
-      </ImageList>
-
-      {/* The Modal for Detailed View */}
-      <Modal
-        open={modalOpen}
-        onClose={handleCloseModal}
-        closeAfterTransition
-      >
-        <Fade in={modalOpen}>
-          <ModalContent>
-            {selectedArt && (() => {
-              const currentMedia = selectedArt.media[selectedImageIndex];
-              const isVideo = currentMedia.url.endsWith('.mp4');
-
-              return (
-                <>
-                  <ImageContainer>
-                    {isVideo ? (
-                      <video
-                        src={currentMedia.url}
-                        style={{ maxWidth: '100%', maxHeight: '90vh', objectFit: 'contain' }}
-                        controls
-                        autoPlay
-                        loop
-                        muted
-                      />
-                    ) : (
-                      <img
-                        src={currentMedia.url}
-                        alt={currentMedia.description}
-                        style={{ maxWidth: '100%', maxHeight: '90vh', objectFit: 'contain' }}
-                      />
-                    )}
-                    
-                    {currentMedia.description && (
-                        <MediaDescription>{currentMedia.description}</MediaDescription>
-                    )}
-
-                    {selectedArt.media.length > 1 && (
-                      <>
-                        <IconButton onClick={handlePrevImage} sx={{ position: 'absolute', top: '50%', left: 8, transform: 'translateY(-50%)', color: 'white', bgcolor: 'rgba(0,0,0,0.4)', '&:hover': { bgcolor: 'rgba(0,0,0,0.6)'} }}>
-                          <ArrowBackIosNewIcon />
-                        </IconButton>
-                        <IconButton onClick={handleNextImage} sx={{ position: 'absolute', top: '50%', right: 8, transform: 'translateY(-50%)', color: 'white', bgcolor: 'rgba(0,0,0,0.4)', '&:hover': { bgcolor: 'rgba(0,0,0,0.6)'} }}>
-                          <ArrowForwardIosIcon />
-                        </IconButton>
-                      </>
-                    )}
-                  </ImageContainer>
-
-                  <DetailsContainer>
-                    <IconButton onClick={handleCloseModal} sx={{ position: 'absolute', top: 8, right: 8, color: 'text.secondary' }}>
-                      <CloseIcon />
-                    </IconButton>
-                    
-                    <Typography variant="h3" component="h2" gutterBottom sx={{ fontWeight: 300 }}>
-                      {selectedArt.name}
-                    </Typography>
-
-                    {selectedArt.sold ? (
-                      <Chip label="Sold" color="error" variant="outlined" sx={{ mb: 2 }} />
-                    ) : (
-                      <Typography variant="h4" color="primary" sx={{ mb: 2, fontWeight: 'bold' }}>
-                        {getPriceDisplay(selectedArt)}
-                      </Typography>
-                    )}
-
-                    <Typography variant="body1" color="text.secondary" paragraph>
-                      {selectedArt.description}
-                    </Typography>
-                  </DetailsContainer>
-                </>
-              );
-            })()}
-          </ModalContent>
-        </Fade>
-      </Modal>
-    </Box>
-  );
 }
 
 export default Gallery;

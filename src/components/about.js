@@ -67,8 +67,8 @@ const AboutMe = ({ onContactOpen }) => {
           <Paper
             elevation={6}
             sx={{
-              backgroundColor: 'rgba(0, 0, 0, 0.7)',
-              backdropFilter: 'blur(10px)',
+              backgroundColor: 'rgba(0, 0, 0, 0.3)',
+              backdropFilter: 'blur(8px)',
               padding: { xs: '2rem', md: '3rem 4rem' },
               borderRadius: '20px',
               maxWidth: '1000px',
@@ -90,7 +90,14 @@ const AboutMe = ({ onContactOpen }) => {
                 Kenneth Heckeroth Art
               </Typography>
               
-              <Typography variant="h6" sx={{ fontSize: { xs: '1rem', md: '1.25rem' }, lineHeight: 1.5, color: 'rgba(255, 255, 255, 0.9)' }}>
+              <Typography 
+                variant="h6" 
+                sx={{ 
+                  fontSize: { xs: '1rem', md: '1.25rem' }, 
+                  lineHeight: 1.5, 
+                  color: 'rgba(255, 255, 255, 0.9)',
+                  whiteSpace: 'pre-line' // <-- Add this line
+                }}>
                 {loading && <CircularProgress size={24} color="inherit" />}
                 {error && <Alert severity="error" sx={{ bgcolor: 'transparent', color: 'red' }}>Could not load bio.</Alert>}
                 {blurb}
