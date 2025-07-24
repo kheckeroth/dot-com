@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
     Box, ImageList, ImageListItem, Modal, IconButton, Typography, CircularProgress,
-    Alert, Fade, Paper, Chip, Button, TextField, FormControlLabel, Checkbox
+    Alert, Fade, Paper, Chip, Button
 } from '@mui/material';
 import { styled, alpha } from '@mui/material/styles';
 import CloseIcon from '@mui/icons-material/Close';
@@ -9,7 +9,7 @@ import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import * as d3 from 'd3';
 
-// --- Styled Components ---
+// --- Styled Components (No Changes) ---
 
 const StyledImageListItem = styled(ImageListItem)(({ theme }) => ({
     position: 'relative',
@@ -139,138 +139,6 @@ const DetailsContainer = styled('div')(({ theme }) => ({
     }
 }));
 
-// --- Inquiry Form Component ---
-
-
-const inquiryFormStyle = {
-   position: 'absolute',
-   top: '50%',
-   left: '50%',
-   transform: 'translate(-50%, -50%)',
-   width: { xs: '90vw', sm: 450 },
-   bgcolor: 'background.paper',
-   border: '1px solid #ddd',
-   borderRadius: 2,
-   boxShadow: 24,
-   p: 4,
-   color: 'black', // Default text color for the modal
-};
-
-function InquiryForm({ open, handleClose, artPiece }) {
-   const [email, setEmail] = useState('');
-   const [message, setMessage] = useState('');
-   const [honeypot, setHoneypot] = useState('');
-   const [isNotRobot, setIsNotRobot] = useState(false);
-   const [submitted, setSubmitted] = useState(false);
-
-   const handleSubmit = (e) => {
-       e.preventDefault();
-       if (honeypot) { // Bot check
-           return;
-       }
-       if (!isNotRobot) {
-           alert('Please confirm you are not a robot.');
-           return;
-       }
-       // Handle form submission logic (e.g., send to an API endpoint)
-       console.log({
-           artPieceId: artPiece.id,
-           artPieceName: artPiece.name,
-           inquiry: {
-               email,
-               message,
-           }
-       });
-       setSubmitted(true);
-   };
-
-   const handleModalClose = () => {
-       // Reset form state before closing
-       setSubmitted(false);
-       setEmail('');
-       setMessage('');
-       setIsNotRobot(false);
-       handleClose();
-   }
-
-   if (!artPiece) return null;
-
-   return (
-       <Modal
-           open={open}
-           onClose={handleModalClose}
-           aria-labelledby="inquiry-modal-title"
-       >
-           <Box sx={inquiryFormStyle}>
-               <IconButton
-                   aria-label="close"
-                   onClick={handleModalClose}
-                   sx={{ position: 'absolute', right: 8, top: 8, color: (theme) => theme.palette.grey.A400 }}
-               >
-                   <CloseIcon />
-               </IconButton>
-               <Typography id="inquiry-modal-title" variant="h6" component="h2" sx={{ color: 'black' }}>
-                   Inquiry for "{artPiece.name}"
-               </Typography>
-               {submitted ? (
-                   <Typography sx={{ mt: 2, color: 'black' }}>
-                       Thank you for your message! We'll get back to you shortly.
-                   </Typography>
-               ) : (
-                   <form onSubmit={handleSubmit} noValidate>
-                       <TextField
-                           fullWidth
-                           label="Your Email"
-                           type="email"
-                           value={email}
-                           onChange={(e) => setEmail(e.target.value)}
-                           margin="normal"
-                           required
-                           InputLabelProps={{
-                               style: { color: 'black' },
-                           }}
-                           inputProps={{
-                               style: { color: 'black' },
-                           }}
-                       />
-                       <TextField
-                           fullWidth
-                           label="Message"
-                           value={message}
-                           onChange={(e) => setMessage(e.target.value)}
-                           margin="normal"
-                           multiline
-                           rows={4}
-                           required
-                           InputLabelProps={{
-                               style: { color: 'black' },
-                           }}
-                           inputProps={{
-                               style: { color: 'black' },
-                           }}
-                       />
-                       {/* Honeypot field for bot prevention */}
-                       <TextField
-                           label="Subject"
-                           value={honeypot}
-                           onChange={(e) => setHoneypot(e.target.value)}
-                           style={{ display: 'none' }}
-                       />
-                       <FormControlLabel
-                           control={<Checkbox checked={isNotRobot} onChange={(e) => setIsNotRobot(e.target.checked)} sx={{ color: 'black' }} />}
-                           label="I am not a robot"
-                           sx={{ color: 'black' }}
-                       />
-                       <Button type="submit" variant="contained" sx={{ mt: 2, display: 'block', color: 'white' }}>
-                           Send Inquiry
-                       </Button>
-                   </form>
-               )}
-           </Box>
-       </Modal>
-   );
-}
-
 
 // --- Main Gallery Component ---
 
@@ -279,7 +147,6 @@ function Gallery() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [modalOpen, setModalOpen] = useState(false);
-    const [inquiryModalOpen, setInquiryModalOpen] = useState(false);
     const [selectedArt, setSelectedArt] = useState(null);
     const [selectedImageIndex, setSelectedImageIndex] = useState(0);
     const galleryRef = useRef(null);
@@ -287,6 +154,7 @@ function Gallery() {
     useEffect(() => {
         const fetchData = async () => {
             try {
+                // Appending timestamp to prevent browser caching of the JSON file
                 const response = await fetch(`https://storage.googleapis.com/kens-art-portfolio-assets/art.json?t=${new Date().getTime()}`);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
@@ -307,7 +175,6 @@ function Gallery() {
     useEffect(() => {
         if (!loading && artPieces.length > 0) {
             const galleryItems = d3.selectAll('.gallery-item-container');
-
             const starPath = "M0,-10 L2.3, -5 L8.3, -5 L5, 0 L8.3, 5 L2.3, 5 L0, 10 L-2.3, 5 L-8.3, 5 L-5, 0 L-8.3, -5 L-2.3, -5 Z";
             const timers = new Map();
 
@@ -319,12 +186,9 @@ function Gallery() {
 
                 const containerWidth = this.clientWidth;
                 const containerHeight = this.clientHeight;
-
                 const svg = item.append('svg').attr('class', 'star-svg');
-
                 const svgWidth = containerWidth * 1.2;
                 const svgHeight = containerHeight * 1.2;
-
                 const centerX = svgWidth / 2;
                 const centerY = svgHeight / 2;
 
@@ -348,43 +212,32 @@ function Gallery() {
 
                     const primaryOrbitRadius = containerWidth * 0.35;
                     const secondaryOrbitRadius = 40;
-
                     const barycenterX = centerX + primaryOrbitRadius * Math.cos(angle * 1.2);
                     const barycenterY = centerY + primaryOrbitRadius * Math.sin(angle * 1.2);
 
                     stars.attr('transform', (d, i) => {
                         const secondaryAngle = angle * 5;
                         const starAngle = secondaryAngle + (i * Math.PI);
-
                         const x = barycenterX + secondaryOrbitRadius * Math.cos(starAngle);
                         const y = barycenterY + secondaryOrbitRadius * Math.sin(starAngle);
-
                         const twinkle = 0.8 + Math.sin(elapsed / 300 + i * Math.PI) * 0.1;
-
                         return `translate(${x}, ${y}) rotate(${elapsed / 10}) scale(${twinkle})`;
                     });
                 });
-
                 timers.set(this, timer);
             });
 
             galleryItems.on('mouseleave', function() {
                 const item = d3.select(this);
                 const timer = timers.get(this);
-
-                setTimeout(() => {
-                    item.style('z-index', 1);
-                }, 300);
-
+                setTimeout(() => { item.style('z-index', 1); }, 300);
                 if (timer) {
                     timer.stop();
                     timers.delete(this);
-
                     const svgWidth = this.clientWidth * 1.2;
                     const svgHeight = this.clientHeight * 1.2;
                     const centerX = svgWidth / 2;
                     const centerY = svgHeight / 2;
-
                     item.selectAll('.orbiting-star')
                         .transition()
                         .duration(400)
@@ -410,16 +263,7 @@ function Gallery() {
 
     const handleCloseModal = () => {
         setModalOpen(false);
-        // Delay clearing to prevent content flash during fade-out
-        setTimeout(() => setSelectedArt(null), 300);
-    };
-
-    const handleOpenInquiryModal = () => {
-        setInquiryModalOpen(true);
-    };
-
-    const handleCloseInquiryModal = () => {
-        setInquiryModalOpen(false);
+        setTimeout(() => setSelectedArt(null), 300); // Delay clear for fade-out
     };
 
     const handlePrevImage = () => {
@@ -434,7 +278,6 @@ function Gallery() {
         );
     };
 
-    // --- UPDATED: Price is now always shown if available ---
     const getPriceDisplay = (item) => {
         if (item.price === 0 || item.price === null) return 'Contact for Info';
         return `$${item.price.toFixed(2)}`;
@@ -496,6 +339,10 @@ function Gallery() {
                         {selectedArt && (() => {
                             const currentMedia = selectedArt.media[selectedImageIndex];
                             const isVideo = currentMedia.url.endsWith('.mp4');
+                            
+                            const recipientEmail = "kheckeroth@email.com"; 
+                            const emailSubject = `Inquiry about "${selectedArt.name}"`;
+                            const mailtoLink = `mailto:${recipientEmail}?subject=${encodeURIComponent(emailSubject)}`;
 
                             return (
                                 <>
@@ -539,7 +386,6 @@ function Gallery() {
                                             {selectedArt.name}
                                         </Typography>
 
-                                        {/* Combined Price and Status */}
                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
                                             <Typography variant="h4" color="primary" sx={{ fontWeight: 'bold' }}>
                                                 {getPriceDisplay(selectedArt)}
@@ -553,10 +399,13 @@ function Gallery() {
                                             {selectedArt.description}
                                         </Typography>
 
-                                        {/* NEW: Inquiry Button */}
+                                        {/* *** CHANGE HERE: Replaced Modal Button with Mailto Link Button *** */}
                                         <Button
                                             variant="contained"
-                                            onClick={handleOpenInquiryModal}
+                                            component="a"
+                                            href={mailtoLink}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
                                             sx={{ mt: 2 }}
                                         >
                                             Inquire about this piece
@@ -568,13 +417,6 @@ function Gallery() {
                     </ModalContent>
                 </Fade>
             </Modal>
-
-            {/* The Modal for the Inquiry Form */}
-            <InquiryForm
-                open={inquiryModalOpen}
-                handleClose={handleCloseInquiryModal}
-                artPiece={selectedArt}
-            />
         </Box>
     );
 }

@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
-import { Modal, Box, Typography, TextField, Button, Checkbox, FormControlLabel, IconButton } from '@mui/material';
+import React from 'react';
+import { Modal, Box, Typography, Button, IconButton, TextField } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 
 const modalStyle = {
   position: 'absolute',
@@ -12,50 +13,32 @@ const modalStyle = {
   border: '2px solid #000',
   boxShadow: 24,
   p: 4,
-  color: 'black', // Set the default text color for the modal to black
+  color: 'black',
 };
 
 function Contact({ open, handleClose }) {
-  const [email, setEmail] = useState('');
-  const [message, setMessage] = useState('');
-  const [honeypot, setHoneypot] = useState('');
-  const [isNotRobot, setIsNotRobot] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (honeypot) {
-      // This is likely a bot
-      return;
-    }
-    if (!isNotRobot) {
-      alert('Please confirm you are not a robot.');
-      return;
-    }
-    // Handle form submission logic here (e.g., send to an API endpoint)
-    console.log({ email, message });
-    setSubmitted(true);
+  // --- Mailto Configuration ---
+  const recipientEmail = "kheckeroth@email.com";
+  const emailSubject = "Contact from Portfolio Website";
+  const mailtoLink = `mailto:${recipientEmail}?subject=${encodeURIComponent(emailSubject)}`;
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(recipientEmail).then(() => {
+
+    });
   };
-
-  const handleModalClose = () => {
-    setSubmitted(false);
-    setEmail('');
-    setMessage('');
-    setIsNotRobot(false);
-    handleClose();
-  }
 
   return (
     <Modal
       open={open}
-      onClose={handleModalClose}
+      onClose={handleClose}
       aria-labelledby="contact-modal-title"
-      aria-describedby="contact-modal-description"
     >
       <Box sx={modalStyle}>
         <IconButton
           aria-label="close"
-          onClick={handleModalClose}
+          onClick={handleClose}
           sx={{
             position: 'absolute',
             right: 8,
@@ -65,65 +48,40 @@ function Contact({ open, handleClose }) {
         >
           <CloseIcon />
         </IconButton>
-        <Typography id="contact-modal-title" variant="h6" component="h2" sx={{ color: 'black' }}>
+        <Typography id="contact-modal-title" variant="h6" component="h2" sx={{ color: 'black', mb: 2 }}>
           Contact Me
         </Typography>
-        {submitted ? (
-          <Typography sx={{ mt: 2, color: 'black' }}>
-            Thank you for your message!
-          </Typography>
-        ) : (
-          <form onSubmit={handleSubmit}>
+
+        <Typography variant="body1" sx={{ color: 'black', mb: 2 }}>
+            You can reach me directly via email. Click the button below to open your email client, or copy my address.
+        </Typography>
+
+        {/* Display email with a copy button */}
+        <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
             <TextField
-              fullWidth
-              label="Your Email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              margin="normal"
-              required
-              InputLabelProps={{
-                style: { color: 'black' },
-              }}
-              inputProps={{
-                style: { color: 'black' },
-              }}
+                fullWidth
+                value={recipientEmail}
+                readOnly
+                variant="outlined"
+                size="small"
+                InputProps={{
+                    style: { color: 'black', backgroundColor: '#f0f0f0' },
+                }}
             />
-            <TextField
-              fullWidth
-              label="Message"
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              margin="normal"
-              multiline
-              rows={4}
-              required
-              InputLabelProps={{
-                style: { color: 'black' },
-              }}
-              inputProps={{
-                style: { color: 'black' },
-              }}
-            />
-            {/* Honeypot field for bot prevention */}
-            <TextField
-              fullWidth
-              label="Subject"
-              value={honeypot}
-              onChange={(e) => setHoneypot(e.target.value)}
-              margin="normal"
-              style={{ display: 'none' }}
-            />
-            <FormControlLabel
-              control={<Checkbox checked={isNotRobot} onChange={(e) => setIsNotRobot(e.target.checked)} sx={{ color: 'black' }} />}
-              label="I am not a robot"
-              sx={{ color: 'black' }}
-            />
-            <Button type="submit" variant="contained" sx={{ mt: 2 }}>
-              Send
-            </Button>
-          </form>
-        )}
+            <IconButton onClick={handleCopy} aria-label="copy email address" sx={{ ml: 1, color: 'black' }}>
+                <ContentCopyIcon />
+            </IconButton>
+        </Box>
+        <Button
+            variant="contained"
+            component="a"
+            href={mailtoLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            fullWidth
+        >
+            Open Email Client
+        </Button>
       </Box>
     </Modal>
   );
