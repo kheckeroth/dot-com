@@ -9,7 +9,7 @@ import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import * as d3 from 'd3';
 
-// --- Styled Components (No Changes) ---
+// --- Styled Components ---
 
 const StyledImageListItem = styled(ImageListItem)(({ theme }) => ({
     position: 'relative',
@@ -98,7 +98,8 @@ const ModalContent = styled(Paper)(({ theme }) => ({
     overflow: 'hidden',
     display: 'flex',
     flexDirection: 'row',
-    backgroundColor: alpha(theme.palette.background.paper, 0.85),
+    // Note: The main modal background is now transparent to allow the panels to control their own look.
+    backgroundColor: 'transparent', 
     backdropFilter: 'blur(8px)',
     boxShadow: 24,
     outline: 'none',
@@ -130,13 +131,28 @@ const MediaDescription = styled(Typography)(({ theme }) => ({
     fontSize: '0.9rem',
 }));
 
+// --- CHANGE HERE: Updated DetailsContainer with a dark theme ---
 const DetailsContainer = styled('div')(({ theme }) => ({
     flex: '1 1 35%',
     padding: theme.spacing(4),
     overflowY: 'auto',
-    '& .MuiTypography-root': {
-        textShadow: '0 0 2px rgba(255, 255, 255, 0.2)',
-    }
+    backgroundColor: '#1e1e1e', // Dark background
+    color: theme.palette.grey[300], // Default light text color
+
+    // Custom dark scrollbar for a cohesive look
+    '&::-webkit-scrollbar': {
+        width: '8px',
+    },
+    '&::-webkit-scrollbar-track': {
+        background: '#2c2c2c',
+    },
+    '&::-webkit-scrollbar-thumb': {
+        background: theme.palette.grey[700],
+        borderRadius: '4px',
+    },
+    '&::-webkit-scrollbar-thumb:hover': {
+        background: theme.palette.grey[600],
+    },
 }));
 
 
@@ -154,7 +170,6 @@ function Gallery() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                // Appending timestamp to prevent browser caching of the JSON file
                 const response = await fetch(`https://storage.googleapis.com/kens-art-portfolio-assets/art.json?t=${new Date().getTime()}`);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
@@ -171,7 +186,7 @@ function Gallery() {
         fetchData();
     }, []);
 
-    // D3 animation effect (omitted for brevity, no changes needed)
+    // D3 animation effect (omitted for brevity, no changes)
     useEffect(() => {
         if (!loading && artPieces.length > 0) {
             const galleryItems = d3.selectAll('.gallery-item-container');
@@ -295,7 +310,13 @@ function Gallery() {
 
     return (
         <Box sx={{ p: { xs: 1, sm: 2, md: 3 } }}>
-            <ImageList ref={galleryRef} variant="standard" cols={3} gap={24}>
+            <ImageList ref={galleryRef} variant="standard" cols={3} gap={24} sx={{
+                scrollbarWidth: 'none', // For Firefox
+                '-ms-overflow-style': 'none', // For IE and Edge
+                '&::-webkit-scrollbar': {
+                    display: 'none', // For Chrome, Safari, and Opera
+                },
+            }}>
                 {artPieces.map((item) => (
                     <div key={item.id} className="gallery-item-container" style={{ position: 'relative' }}>
                         <StyledImageListItem onClick={() => handleOpenModal(item)}>
@@ -376,18 +397,19 @@ function Gallery() {
                                             </>
                                         )}
                                     </ImageContainer>
-
+                                    
+                                    {/* --- CHANGE HERE: Updated text and icon colors for dark theme --- */}
                                     <DetailsContainer>
-                                        <IconButton onClick={handleCloseModal} sx={{ position: 'absolute', top: 8, right: 8, color: 'text.secondary' }}>
+                                        <IconButton onClick={handleCloseModal} sx={{ position: 'absolute', top: 8, right: 8, color: 'grey.500' }}>
                                             <CloseIcon />
                                         </IconButton>
 
-                                        <Typography variant="h3" component="h2" gutterBottom sx={{ fontWeight: 300 }}>
+                                        <Typography variant="h3" component="h2" gutterBottom sx={{ fontWeight: 300, color: 'common.white' }}>
                                             {selectedArt.name}
                                         </Typography>
 
                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-                                            <Typography variant="h4" color="primary" sx={{ fontWeight: 'bold' }}>
+                                            <Typography variant="h4" color="primary.light" sx={{ fontWeight: 'bold' }}>
                                                 {getPriceDisplay(selectedArt)}
                                             </Typography>
                                             {selectedArt.sold && (
@@ -395,11 +417,10 @@ function Gallery() {
                                             )}
                                         </Box>
 
-                                        <Typography variant="body1" color="text.secondary" paragraph>
+                                        <Typography variant="body1" color="grey.400" paragraph>
                                             {selectedArt.description}
                                         </Typography>
 
-                                        {/* *** CHANGE HERE: Replaced Modal Button with Mailto Link Button *** */}
                                         <Button
                                             variant="contained"
                                             component="a"
