@@ -45,7 +45,7 @@ const AboutMe = ({ onContactOpen }) => {
           height: 'auto',
           zIndex: -1,
           objectFit: 'cover',
-          filter: 'brightness(0.5)',
+          filter: 'brightness(0.9)',
         }}
       >
         <source src={videoPath} type="video/mp4" />

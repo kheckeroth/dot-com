@@ -294,7 +294,7 @@ function Gallery() {
     };
 
     const getPriceDisplay = (item) => {
-        if (item.price === 0 || item.price === null) return 'Contact for Info';
+        if (item.price === 0 || item.price === null) return '';
         return `$${item.price.toFixed(2)}`;
     };
 
