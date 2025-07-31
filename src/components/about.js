@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Typography, Paper, Avatar, CircularProgress, Alert } from '@mui/material';
 
+// CHANGE: Updated the recommended font import to include a lighter '300' weight for more crispness.
+// <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@300;400;700&display=swap" rel="stylesheet">
+
 const videoPath = 'https://storage.googleapis.com/kens-art-portfolio-assets/Nebula_Scene_Video_Generation_Request.mp4';
 
 const AboutMe = ({ onContactOpen }) => {
@@ -16,7 +19,7 @@ const AboutMe = ({ onContactOpen }) => {
           throw new Error(`Failed to fetch: ${response.status}`);
         }
         const data = await response.json();
-        setBlurb(data.blurb); 
+        setBlurb(data.blurb);
       } catch (e) {
         setError(e.message);
       } finally {
@@ -25,7 +28,9 @@ const AboutMe = ({ onContactOpen }) => {
     };
 
     fetchAboutData();
-  }, []); 
+  }, []);
+
+  const highlightColor = 'rgb(233, 0, 255)';
 
   return (
     <>
@@ -67,71 +72,62 @@ const AboutMe = ({ onContactOpen }) => {
             elevation={6}
             sx={{
               backgroundColor: 'rgba(0, 0, 0, 0.3)',
-              backdropFilter: 'blur(8px)',
+              backdropFilter: 'blur(20px)',
               padding: { xs: '2rem', md: '3rem 4rem' },
-              borderRadius: '20px',
+              borderRadius: '5px',
               maxWidth: '1000px',
-              fontFamily: "'Helvetica Neue', sans-serif",
+              fontFamily: "'Oxanium', sans-serif",
               display: 'flex',
-              flexDirection: 'column', 
-              gap: 3, 
+              flexDirection: 'column',
+              gap: 3,
               border: '1px solid rgba(255, 255, 255, 0.1)',
             }}
           >
+            <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: 400, letterSpacing: '1px', textAlign: 'left' }}>
+              Celestial Works by <span style={{ color: highlightColor }}>Kenneth Heckeroth</span>
+            </Typography>
+
+            <Typography
+              variant="body1" 
+              sx={{
+                fontWeight: 300,
+                fontSize: { xs: '1rem', md: '1.15rem' }, 
+                lineHeight: 1.6,
+                color: 'rgba(255, 255, 255, 0.9)',
+                whiteSpace: 'pre-line',
+                textAlign: 'left'
+              }}>
+              {loading && <CircularProgress size={24} color="inherit" />}
+              {error && <Alert severity="error" sx={{ bgcolor: 'transparent', color: 'red' }}>Could not load bio.</Alert>}
+              {blurb}
+            </Typography>
+
             <Box sx={{
               display: 'flex',
-              flexDirection: { xs: 'column', md: 'row' },
               alignItems: 'center',
-              gap: { xs: 2, md: 4 },
-              width: '100%',
-              textAlign: { xs: 'center', md: 'left' }
+              gap: 2,
+              mt: 2,
             }}>
               <Avatar
                 alt="Kenneth Heckeroth"
-                src="https://storage.googleapis.com/kens-art-portfolio-assets/headshot.jpeg"
+                src="https://storage.googleapis.com/kens-art-portfolio-assets/headshot.jpg"
                 sx={{
-                  width: 180,
-                  height: 180,
+                  width: 60,
+                  height: 60,
                   border: '3px solid rgba(255, 255, 255, 0.8)',
-                  transition: 'box-shadow 0.4s ease-in-out, transform 0.3s ease-in-out',
                   boxShadow: '0 0 5px rgba(255, 255, 255, 0.2)',
-                  '&:hover': {
-                    transform: 'scale(1.03)',
-                    boxShadow: `
-                      0 0 8px rgba(255, 255, 255, 1),
-                      0 0 25px rgba(100, 200, 255, 0.8),
-                      0 0 50px rgba(0, 150, 255, 0.6)
-                    `,
-                  }
                 }}
               />
-              <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: 'bold', color: 'white', letterSpacing: '1px' }}>
-                Celestial Art Works
-              </Typography>
+              <Box sx={{ textAlign: 'left' }}>
+                <Typography variant="subtitle1" sx={{ fontWeight: 400, fontSize: '1.2rem' }}>
+                  Kenneth Heckeroth
+                </Typography>
+                <Typography variant="body1" sx={{ color: highlightColor, fontWeight: 300 }}>
+                  Artist and Creator
+                </Typography>
+              </Box>
             </Box>
-            <Typography 
-              variant="h6" 
-              sx={{ 
-                fontSize: { xs: '1rem', md: '1.25rem' }, 
-                lineHeight: 1.5, 
-                color: 'rgba(255, 255, 255, 0.9)',
-                whiteSpace: 'pre-line',
-                textAlign: { xs: 'center', md: 'left' }
-              }}>
-                {loading && <CircularProgress size={24} color="inherit" />}
-                {error && <Alert severity="error" sx={{ bgcolor: 'transparent', color: 'red' }}>Could not load bio.</Alert>}
-                {blurb}
-            </Typography>
-            <Typography
-              variant="body1"
-              sx={{
-                mt: 2,
-                textAlign: 'right',
-                fontStyle: 'italic',
-                color: 'rgba(255, 255, 255, 0.7)'
-              }}>
-                — Kenneth Heckeroth
-            </Typography>
+
           </Paper>
         </Box>
       </Box>
