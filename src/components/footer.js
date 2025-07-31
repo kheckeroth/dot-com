@@ -1,10 +1,11 @@
 import React from 'react';
 import { Paper, Button, Box, IconButton } from '@mui/material';
 import InstagramIcon from '@mui/icons-material/Instagram';
+import EmailIcon from '@mui/icons-material/Email';
 
 const Footer = ({ onContactOpen }) => {
-
   const instagramUrl = 'https://www.instagram.com/mindless_analysis';
+  const accentColor = 'rgb(175, 38, 126)';
 
   return (
     <Paper
@@ -16,7 +17,7 @@ const Footer = ({ onContactOpen }) => {
         right: 0,
         height: '100px',
         backgroundColor: 'rgba(0, 0, 0, 0.8)',
-        backdropFilter: 'blur(5px)', 
+        backdropFilter: 'blur(5px)',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
@@ -28,11 +29,13 @@ const Footer = ({ onContactOpen }) => {
           variant="contained"
           size="large"
           onClick={onContactOpen}
+          startIcon={<EmailIcon />}
           sx={{
-            bgcolor: 'rgba(255, 255, 255, 0.2)',
+            textTransform: 'none',
+            bgcolor: accentColor,
             '&:hover': {
-              bgcolor: 'rgba(255, 255, 255, 0.3)',
-            }
+              bgcolor: 'rgb(148, 32, 107)',
+            },
           }}
         >
           Contact Me
@@ -50,7 +53,7 @@ const Footer = ({ onContactOpen }) => {
             '&:hover': {
               color: 'rgba(255, 255, 255, 1)',
               transform: 'scale(1.1)',
-            }
+            },
           }}
         >
           <InstagramIcon sx={{ fontSize: '32px' }} />

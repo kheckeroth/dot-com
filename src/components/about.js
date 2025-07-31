@@ -83,7 +83,7 @@ const AboutMe = ({ onContactOpen }) => {
               border: '1px solid rgba(255, 255, 255, 0.1)',
             }}
           >
-            <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: 400, letterSpacing: '1px', textAlign: 'left' }}>
+            <Typography variant="h4" component="h1" gutterBottom sx={{ letterSpacing: '1px', textAlign: 'left' }}>
               Celestial Works by <span style={{ color: highlightColor }}>Kenneth Heckeroth</span>
             </Typography>
 

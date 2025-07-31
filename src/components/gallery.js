@@ -9,8 +9,6 @@ import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import * as d3 from 'd3';
 
-// --- Styled Components ---
-
 const StyledImageListItem = styled(ImageListItem)(({ theme }) => ({
     position: 'relative',
     cursor: 'pointer',
@@ -36,20 +34,13 @@ const StyledImageListItem = styled(ImageListItem)(({ theme }) => ({
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'flex-end',
-        padding: theme.spacing(2),
+        padding: '25px',
         color: 'white',
         opacity: 0,
-        '& .title, & .price': {
-            transform: 'translateY(20px)',
-            transition: 'transform 0.3s ease-out',
-        },
     },
     '&:hover .overlay': {
         backgroundColor: 'rgba(0, 0, 0, 0.6)',
         opacity: 1,
-        '& .title, & .price': {
-            transform: 'translateY(0)',
-        },
     },
     '& img': {
         width: '100%',
@@ -61,8 +52,8 @@ const StyledImageListItem = styled(ImageListItem)(({ theme }) => ({
 
 const SoldBadge = styled('div')(({ theme }) => ({
     position: 'absolute',
-    top: theme.spacing(1.5),
-    left: theme.spacing(1.5),
+    top: theme.spacing(3),
+    left: theme.spacing(3),
     backgroundColor: alpha(theme.palette.error.main, 0.85),
     color: theme.palette.error.contrastText,
     padding: theme.spacing(0.5, 1.5),
@@ -75,8 +66,8 @@ const SoldBadge = styled('div')(({ theme }) => ({
 
 const NotForSaleBadge = styled('div')(({ theme }) => ({
     position: 'absolute',
-    top: theme.spacing(1.5),
-    left: theme.spacing(1.5),
+    top: theme.spacing(3),
+    left: theme.spacing(3),
     backgroundColor: alpha(theme.palette.secondary.main, 0.85),
     color: theme.palette.secondary.contrastText,
     padding: theme.spacing(0.5, 1.5),
@@ -98,8 +89,7 @@ const ModalContent = styled(Paper)(({ theme }) => ({
     overflow: 'hidden',
     display: 'flex',
     flexDirection: 'row',
-    // Note: The main modal background is now transparent to allow the panels to control their own look.
-    backgroundColor: 'transparent', 
+    backgroundColor: 'transparent',
     backdropFilter: 'blur(8px)',
     boxShadow: 24,
     outline: 'none',
@@ -131,15 +121,13 @@ const MediaDescription = styled(Typography)(({ theme }) => ({
     fontSize: '0.9rem',
 }));
 
-// --- CHANGE HERE: Updated DetailsContainer with a dark theme ---
 const DetailsContainer = styled('div')(({ theme }) => ({
     flex: '1 1 35%',
     padding: theme.spacing(4),
     overflowY: 'auto',
-    backgroundColor: '#1e1e1e', // Dark background
-    color: theme.palette.grey[300], // Default light text color
+    backgroundColor: '#1e1e1e',
+    color: theme.palette.grey[300],
 
-    // Custom dark scrollbar for a cohesive look
     '&::-webkit-scrollbar': {
         width: '8px',
     },
@@ -154,9 +142,6 @@ const DetailsContainer = styled('div')(({ theme }) => ({
         background: theme.palette.grey[600],
     },
 }));
-
-
-// --- Main Gallery Component ---
 
 function Gallery() {
     const [artPieces, setArtPieces] = useState([]);
@@ -186,7 +171,6 @@ function Gallery() {
         fetchData();
     }, []);
 
-    // D3 animation effect (omitted for brevity, no changes)
     useEffect(() => {
         if (!loading && artPieces.length > 0) {
             const galleryItems = d3.selectAll('.gallery-item-container');
@@ -268,8 +252,6 @@ function Gallery() {
         }
     }, [loading, artPieces]);
 
-    // --- Modal and Image Navigation Handlers ---
-
     const handleOpenModal = (artPiece) => {
         setSelectedArt(artPiece);
         setSelectedImageIndex(0);
@@ -278,7 +260,7 @@ function Gallery() {
 
     const handleCloseModal = () => {
         setModalOpen(false);
-        setTimeout(() => setSelectedArt(null), 300); // Delay clear for fade-out
+        setTimeout(() => setSelectedArt(null), 300);
     };
 
     const handlePrevImage = () => {
@@ -298,8 +280,6 @@ function Gallery() {
         return `$${item.price.toFixed(2)}`;
     };
 
-    // --- Render Logic ---
-
     if (loading) {
         return <Box sx={{ display: 'flex', justifyContent: 'center', p: 5 }}><CircularProgress /></Box>;
     }
@@ -311,10 +291,10 @@ function Gallery() {
     return (
         <Box sx={{ p: { xs: 1, sm: 2, md: 3 } }}>
             <ImageList ref={galleryRef} variant="standard" cols={3} gap={24} sx={{
-                scrollbarWidth: 'none', // For Firefox
-                '-ms-overflow-style': 'none', // For IE and Edge
+                scrollbarWidth: 'none',
+                msOverflowStyle: 'none', 
                 '&::-webkit-scrollbar': {
-                    display: 'none', // For Chrome, Safari, and Opera
+                    display: 'none',
                 },
             }}>
                 {artPieces.map((item) => (
@@ -339,7 +319,7 @@ function Gallery() {
                                 </Box>
                             )}
                             <div className="overlay">
-                                <Typography variant="h6" className="title">{item.name}</Typography>
+                                <Typography variant="h5" className="title">{item.name}</Typography>
                                 <Typography variant="body1" className="price">
                                     {getPriceDisplay(item)}
                                 </Typography>
@@ -349,7 +329,6 @@ function Gallery() {
                 ))}
             </ImageList>
 
-            {/* The Modal for Detailed View */}
             <Modal
                 open={modalOpen}
                 onClose={handleCloseModal}
@@ -398,18 +377,17 @@ function Gallery() {
                                         )}
                                     </ImageContainer>
                                     
-                                    {/* --- CHANGE HERE: Updated text and icon colors for dark theme --- */}
                                     <DetailsContainer>
                                         <IconButton onClick={handleCloseModal} sx={{ position: 'absolute', top: 8, right: 8, color: 'grey.500' }}>
                                             <CloseIcon />
                                         </IconButton>
 
-                                        <Typography variant="h3" component="h2" gutterBottom sx={{ fontWeight: 300, color: 'common.white' }}>
+                                        <Typography variant="h3" component="h2" gutterBottom sx={{ fontWeight: 300, color: 'rgb(175, 38, 126)' }}>
                                             {selectedArt.name}
                                         </Typography>
 
                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-                                            <Typography variant="h4" color="primary.light" sx={{ fontWeight: 'bold' }}>
+                                            <Typography variant="h6" color="primary.light">
                                                 {getPriceDisplay(selectedArt)}
                                             </Typography>
                                             {selectedArt.sold && (
@@ -427,7 +405,14 @@ function Gallery() {
                                             href={mailtoLink}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            sx={{ mt: 2 }}
+                                            sx={{ 
+                                                mt: 2,
+                                                textTransform: 'none',
+                                                backgroundColor: 'rgb(175, 38, 126)',
+                                                '&:hover': {
+                                                    backgroundColor: 'rgb(148, 32, 107)'
+                                                }
+                                            }}
                                         >
                                             Inquire about this piece
                                         </Button>
