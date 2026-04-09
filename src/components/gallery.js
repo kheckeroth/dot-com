@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
     Box, ImageList, ImageListItem, Modal, IconButton, Typography, CircularProgress,
-    Alert, Fade, Paper, Button
+    Alert, Fade, Paper
 } from '@mui/material';
-import { styled, alpha } from '@mui/material/styles';
+import { styled } from '@mui/material/styles';
 import CloseIcon from '@mui/icons-material/Close';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
