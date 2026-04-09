@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
     Box, ImageList, ImageListItem, Modal, IconButton, Typography, CircularProgress,
-    Alert, Fade, Paper, Chip, Button
+    Alert, Fade, Paper, Button
 } from '@mui/material';
 import { styled, alpha } from '@mui/material/styles';
 import CloseIcon from '@mui/icons-material/Close';
@@ -275,10 +275,10 @@ function Gallery() {
         );
     };
 
-    const getPriceDisplay = (item) => {
-        if (item.price === 0 || item.price === null) return '';
-        return `$${item.price.toFixed(2)}`;
-    };
+    // const getPriceDisplay = (item) => {
+    //     if (item.price === 0 || item.price === null) return '';
+    //     return `$${item.price.toFixed(2)}`;
+    // };
 
     if (loading) {
         return <Box sx={{ display: 'flex', justifyContent: 'center', p: 5 }}><CircularProgress /></Box>;
