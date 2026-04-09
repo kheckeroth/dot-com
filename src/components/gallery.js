@@ -50,33 +50,33 @@ const StyledImageListItem = styled(ImageListItem)(({ theme }) => ({
     }
 }));
 
-const SoldBadge = styled('div')(({ theme }) => ({
-    position: 'absolute',
-    top: theme.spacing(3),
-    left: theme.spacing(3),
-    backgroundColor: alpha(theme.palette.error.main, 0.85),
-    color: theme.palette.error.contrastText,
-    padding: theme.spacing(0.5, 1.5),
-    borderRadius: theme.shape.borderRadius,
-    fontWeight: 'bold',
-    fontSize: '0.8rem',
-    backdropFilter: 'blur(4px)',
-    zIndex: 1,
-}));
+// const SoldBadge = styled('div')(({ theme }) => ({
+//     position: 'absolute',
+//     top: theme.spacing(3),
+//     left: theme.spacing(3),
+//     backgroundColor: alpha(theme.palette.error.main, 0.85),
+//     color: theme.palette.error.contrastText,
+//     padding: theme.spacing(0.5, 1.5),
+//     borderRadius: theme.shape.borderRadius,
+//     fontWeight: 'bold',
+//     fontSize: '0.8rem',
+//     backdropFilter: 'blur(4px)',
+//     zIndex: 1,
+// }));
 
-const NotForSaleBadge = styled('div')(({ theme }) => ({
-    position: 'absolute',
-    top: theme.spacing(3),
-    left: theme.spacing(3),
-    backgroundColor: alpha(theme.palette.secondary.main, 0.85),
-    color: theme.palette.secondary.contrastText,
-    padding: theme.spacing(0.5, 1.5),
-    borderRadius: theme.shape.borderRadius,
-    fontWeight: 'bold',
-    fontSize: '0.8rem',
-    backdropFilter: 'blur(4px)',
-    zIndex: 1,
-}));
+// const NotForSaleBadge = styled('div')(({ theme }) => ({
+//     position: 'absolute',
+//     top: theme.spacing(3),
+//     left: theme.spacing(3),
+//     backgroundColor: alpha(theme.palette.secondary.main, 0.85),
+//     color: theme.palette.secondary.contrastText,
+//     padding: theme.spacing(0.5, 1.5),
+//     borderRadius: theme.shape.borderRadius,
+//     fontWeight: 'bold',
+//     fontSize: '0.8rem',
+//     backdropFilter: 'blur(4px)',
+//     zIndex: 1,
+// }));
 
 const ModalContent = styled(Paper)(({ theme }) => ({
     position: 'absolute',
@@ -300,11 +300,11 @@ function Gallery() {
                 {artPieces.map((item) => (
                     <div key={item.id} className="gallery-item-container" style={{ position: 'relative' }}>
                         <StyledImageListItem onClick={() => handleOpenModal(item)}>
-                            {item.sold ? (
+                            {/* {item.sold ? (
                                 <SoldBadge>Sold</SoldBadge>
                             ) : (item.price === 0 || item.price === null) && (
                                 <NotForSaleBadge>Not for Sale</NotForSaleBadge>
-                            )}
+                            )} */}
 
                             {item.media && item.media[0] ? (
                                 <img
@@ -340,9 +340,9 @@ function Gallery() {
                             const currentMedia = selectedArt.media[selectedImageIndex];
                             const isVideo = currentMedia.url.endsWith('.mp4');
                             
-                            const recipientEmail = "kheckeroth@email.com"; 
-                            const emailSubject = `Inquiry about "${selectedArt.name}"`;
-                            const mailtoLink = `mailto:${recipientEmail}?subject=${encodeURIComponent(emailSubject)}`;
+                            //const recipientEmail = "kheckeroth@email.com"; 
+                            //const emailSubject = `Inquiry about "${selectedArt.name}"`;
+                            //const mailtoLink = `mailto:${recipientEmail}?subject=${encodeURIComponent(emailSubject)}`;
 
                             return (
                                 <>
@@ -399,7 +399,7 @@ function Gallery() {
                                             {selectedArt.description}
                                         </Typography>
 
-                                        <Button
+                                        {/* <Button
                                             variant="contained"
                                             component="a"
                                             href={mailtoLink}
@@ -415,7 +415,7 @@ function Gallery() {
                                             }}
                                         >
                                             Inquire about this piece
-                                        </Button>
+                                        </Button> */}
                                     </DetailsContainer>
                                 </>
                             );
