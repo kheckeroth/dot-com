@@ -320,9 +320,9 @@ function Gallery() {
                             )}
                             <div className="overlay">
                                 <Typography variant="h5" className="title">{item.name}</Typography>
-                                <Typography variant="body1" className="price">
+                                {/* <Typography variant="body1" className="price">
                                     {getPriceDisplay(item)}
-                                </Typography>
+                                </Typography> */}
                             </div>
                         </StyledImageListItem>
                     </div>
@@ -387,12 +387,12 @@ function Gallery() {
                                         </Typography>
 
                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-                                            <Typography variant="h6" color="primary.light">
+                                            {/* <Typography variant="h6" color="primary.light">
                                                 {getPriceDisplay(selectedArt)}
                                             </Typography>
                                             {selectedArt.sold && (
                                                 <Chip label="Sold" color="error" variant="outlined" />
-                                            )}
+                                            )} */}
                                         </Box>
 
                                         <Typography variant="body1" color="grey.400" paragraph>
