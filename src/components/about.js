@@ -57,7 +57,7 @@ const AboutMe = ({ onContactOpen }) => {
         Your browser does not support the video tag.
       </Box>
 
-      <Box sx={{ color: 'white', pb: '120px' }}>
+      <Box sx={{ color: 'white' }}>
         <Box
           sx={{
             display: 'flex',
