@@ -15,7 +15,7 @@ const Footer = ({ onContactOpen }) => {
         bottom: 0,
         left: 0,
         right: 0,
-        height: '100px',
+        height: '120px',
         backgroundColor: 'rgba(0, 0, 0, 0.8)',
         backdropFilter: 'blur(5px)',
         display: 'flex',
