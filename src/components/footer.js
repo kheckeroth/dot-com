@@ -1,5 +1,5 @@
 import React from 'react';
-import { Paper, Button, Box, IconButton } from '@mui/material';
+import { Paper, Button, Box, IconButton, Typography } from '@mui/material';
 import InstagramIcon from '@mui/icons-material/Instagram';
 import EmailIcon from '@mui/icons-material/Email';
 
@@ -48,17 +48,20 @@ const Footer = ({ onContactOpen }) => {
           rel="noopener noreferrer"
           aria-label="Instagram Profile"
           sx={{
-            color: 'rgba(255, 255, 255, 0.7)',
+            color: 'white',
             transition: 'color 0.3s ease, transform 0.3s ease',
             '&:hover': {
-              color: 'rgba(255, 255, 255, 1)',
+              color: accentColor,
               transform: 'scale(1.1)',
             },
           }}
         >
-          <InstagramIcon sx={{ fontSize: '32px' }} />
+          <InstagramIcon sx={{ fontSize: '2.5rem' }} />
         </IconButton>
       </Box>
+      <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.5)', position: 'absolute', bottom: '10px', left: '50%', transform: 'translateX(-50%)' }}>
+        Kenneth Heckeroth | Artist in Tacoma, WA
+      </Typography>
     </Paper>
   );
 };

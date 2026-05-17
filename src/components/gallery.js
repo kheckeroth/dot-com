@@ -153,22 +153,29 @@ function Gallery() {
     const galleryRef = useRef(null);
 
     useEffect(() => {
-        const fetchData = async () => {
+        const fetchArtData = async () => {
             try {
                 const response = await fetch(`https://storage.googleapis.com/kens-art-portfolio-assets/art.json?t=${new Date().getTime()}`);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 const data = await response.json();
-                setArtPieces(data.art);
+                
+                // Add descriptive alt text to each art piece for better SEO
+                const artWithAltText = data.art.map(art => ({
+                    ...art,
+                    alt: `${art.title} - a celestial resin art piece by Kenneth Heckeroth. ID: ${art.id}`
+                }));
+
+                setArtPieces(artWithAltText);
             } catch (e) {
                 setError(e.message);
-                console.error("Failed to fetch artwork data:", e);
             } finally {
                 setLoading(false);
             }
         };
-        fetchData();
+
+        fetchArtData();
     }, []);
 
     useEffect(() => {
@@ -310,7 +317,7 @@ function Gallery() {
                                 <img
                                     src={`${item.media[0].url}?w=400&fit=crop&auto=format`}
                                     srcSet={`${item.media[0].url}?w=400&fit=crop&auto=format&dpr=2 2x`}
-                                    alt={item.name}
+                                    alt={item.alt} // Use the generated alt text
                                     loading="lazy"
                                 />
                             ) : (
